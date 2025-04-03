@@ -11,7 +11,14 @@
       "id": "game-boosts",
       "name": "Game Boosts",
       "description": "Enhance your gameplay with these special items and abilities",
-      "packages": ["3307114", "3307115", "3307116", "3307117", "3307118"],
+      "packages": [ "3307117", "3307118"],
+      "order": 2
+    },
+    {
+      "id": "premium-items",
+      "name": "Premium Items",
+      "description": "Exclusive items that enhance your gaming experience",
+      "packages": ["3307114", "3307115", "3307116"],
       "order": 2
     }
   ],

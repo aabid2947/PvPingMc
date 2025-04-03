@@ -58,23 +58,18 @@ export function categorizePackages(packages = [], categories = []) {
   let packageArray = [];
   
   if (packages) {
-    // Handle API response format with data property
-    if (packages.data && Array.isArray(packages.data)) {
+    if (Array.isArray(packages.data)) {
       packageArray = packages.data;
-    } 
-    // Handle direct array
-    else if (Array.isArray(packages)) {
+    } else if (Array.isArray(packages)) {
       packageArray = packages;
-    }
-    // Log warning if packages is in an unexpected format
-    else {
-      console.warn('Unexpected packages format in categorizePackages:', packages);
+    } else {
+      console.warn('Unexpected packages format:', packages);
       packageArray = [];
     }
   }
-  
-  // If no categories exist, return all packages as uncategorized
-  if (!categories || categories.length === 0) {
+
+  // Handle empty categories case
+  if (!categories?.length) {
     return {
       uncategorized: {
         id: 'uncategorized',
@@ -84,68 +79,85 @@ export function categorizePackages(packages = [], categories = []) {
       }
     };
   }
-  
-  // Initialize result with all categories having empty arrays
-  const result = categories.reduce((acc, category) => {
+
+  // Process categories with flexible package reference handling
+  const categoryMap = categories.reduce((acc, category) => {
+    const packageIds = new Set();
+    
+    // Handle different package reference formats
+    if (category.packages) {
+      if (Array.isArray(category.packages)) {
+        // Array of IDs or objects with IDs
+        category.packages.forEach(item => {
+          const id = item?.id ? String(item.id) : String(item);
+          packageIds.add(id);
+        });
+      } else if (typeof category.packages === 'object') {
+        // Object with ID keys
+        Object.keys(category.packages).forEach(key => {
+          packageIds.add(String(key));
+        });
+      }
+    }
+
     acc[category.id] = {
       ...category,
+      packageIds,
       packages: []
     };
     return acc;
   }, {});
-  
-  // Add uncategorized for packages not in any category
-  result.uncategorized = {
-    id: 'uncategorized',
-    name: 'Other Packages',
-    description: 'Additional packages',
-    packages: []
+
+  // Process packages with thorough ID matching
+  const result = { 
+    ...categoryMap,
+    uncategorized: {
+      id: 'uncategorized',
+      name: 'Other Packages',
+      description: 'Additional packages',
+      packages: []
+    }
   };
-  
-  // Sort packages into their categories
+
   packageArray.forEach(pkg => {
-    let categorized = false;
-    
-    // Skip packages without IDs
     if (!pkg.id) {
-      console.warn('Package without ID found, skipping categorization');
+      console.warn('Package missing ID:', pkg);
       return;
     }
-    
-    for (const category of categories) {
-      // Ensure category.packages is an array before checking
-      if (Array.isArray(category.packages) && category.packages.includes(pkg.id)) {
-        result[category.id].packages.push(pkg);
-        categorized = true;
-        break;
+
+    const pkgId = String(pkg.id);
+    let isCategorized = false;
+
+    // Check all category ID sets
+    for (const [catId, category] of Object.entries(categoryMap)) {
+      if (category.packageIds.has(pkgId)) {
+        result[catId].packages.push(pkg);
+        isCategorized = true;
       }
     }
-    
-    // If package doesn't belong to any category, put it in uncategorized
-    if (!categorized) {
+
+    if (!isCategorized) {
       result.uncategorized.packages.push(pkg);
     }
   });
-  
-  // Remove empty categories
-  Object.keys(result).forEach(key => {
-    if (result[key].packages.length === 0) {
-      delete result[key];
-    }
+
+  // Cleanup and final formatting
+  Object.values(result).forEach(cat => {
+    delete cat.packageIds;
+    if (cat.packages.length === 0 && cat.id !== 'uncategorized') delete result[cat.id];
   });
-  
-  // If only one category exists, rename it to match the category
-  if (Object.keys(result).length === 1) {
-    const onlyCategory = Object.values(result)[0];
-    if (onlyCategory.id === 'uncategorized') {
-      onlyCategory.name = 'All Packages';
-      onlyCategory.description = 'All available packages';
-    }
+
+  // Special single-category case
+  const validCats = Object.keys(result).filter(k => k !== 'uncategorized');
+  if (validCats.length === 1 && !result.uncategorized.packages.length) {
+    const [mainCat] = validCats;
+    result[mainCat].name = 'All Packages';
+    result[mainCat].description = 'All available packages';
+    delete result.uncategorized;
   }
-  
+
   return result;
 }
-
 /**
  * Get mock packages for development mode
  * Each mock package includes id, name, description, price, features, and popular flag

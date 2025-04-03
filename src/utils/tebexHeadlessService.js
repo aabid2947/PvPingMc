@@ -107,20 +107,18 @@ export const fetchCategories = async () => {
  */
 export const fetchPackages = async () => {
   // Check if we're in development mode and not forcing production
-  const isDevMode = isDevelopment && !forceProduction();
+  // const isDevMode = isDevelopment && !forceProduction();
   
-  // In development, always use mock data
-  if (isDevMode) {
-    console.log('[Tebex] Using mock package data (development mode)');
-    return getMockPackages();
-  }
+  // // In development, always use mock data
+  // if (isDevMode) {
+  //   console.log('[Tebex] Using mock package data (development mode)');
+  //   return getMockPackages();
+  // }
   
   try {
-    console.log(`[Tebex] Attempting to fetch packages from API with token: ${STORE_TOKEN}`);
     
     // Try the categories endpoint which is more reliable
     const categoriesUrl = `${BASE_URL}/accounts/${STORE_TOKEN}/categories?includePackages=1`;
-    console.log(`[Tebex] Fetching from categories endpoint: ${categoriesUrl}`);
     
     let response;
     try {
@@ -128,23 +126,23 @@ export const fetchPackages = async () => {
       console.log(`[Tebex] Response status: ${response.status}`);
     } catch (fetchError) {
       console.error('[Tebex] Network error fetching categories:', fetchError);
-      return getMockPackages();
+      return 
     }
     
     // Handle 404 or other error status
     if (!response.ok) {
       console.warn(`[Tebex] Categories endpoint failed with status: ${response.status}`);
       // Don't throw, just return mock data
-      return getMockPackages();
+      return 
     }
     
-    let categoriesData;
+    let categoriesData;            
     try {
       categoriesData = await response.json();
       console.log('[Tebex] Successfully fetched categories data');
     } catch (jsonError) {
       console.error('[Tebex] Error parsing JSON response:', jsonError);
-      return getMockPackages();
+      return 
     }
     
     // Extract packages from categories
@@ -603,14 +601,12 @@ export const getBasket = async (basketIdent) => {
   }
   
   try {
-    console.log(`[Tebex] Fetching basket with ID: ${basketIdent}`);
     
     let response;
     try {
       const url = `${BASE_URL}/accounts/${STORE_TOKEN}/baskets/${basketIdent}`;
-      console.log(`[Tebex] GET ${url}`);
+   
       response = await fetch(url);
-      console.log(`[Tebex] Basket response status: ${response.status}`);
     } catch (fetchError) {
       console.error('[Tebex] Network error fetching basket:', fetchError);
       return getMockBasketById(basketIdent);
@@ -679,21 +675,6 @@ export const getBasketAuthLinks = async (basketIdent, returnUrl = window.locatio
   }
 };
 
-function getMockAuthLinks(basketIdent, returnUrl) {
-  const mockBasketIdent = basketIdent || `mock-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  
-  // Include returnUrl in the auth URL if provided
-  const authUrl = returnUrl 
-    ? `https://auth.tebex.io/login/minecraft?basket=${mockBasketIdent}&return=${encodeURIComponent(returnUrl)}`
-    : `https://auth.tebex.io/login/minecraft?basket=${mockBasketIdent}`;
-    
-  return [
-    {
-      name: "Minecraft",
-      url: authUrl
-    }
-  ];
-}
 
 /**
  * Process checkout with Minecraft username
@@ -701,7 +682,7 @@ function getMockAuthLinks(basketIdent, returnUrl) {
  * @param {string} username - Minecraft username
  * @param {string} edition - Minecraft edition (java/bedrock)
  * @returns {Promise<Object>} Checkout information
- */
+*/
 export const processCheckout = async (basketIdent, username, edition) => {
   try {
     console.log(`[Tebex] Processing checkout for ${username} (${edition})`);
@@ -763,7 +744,7 @@ export const processCheckout = async (basketIdent, username, edition) => {
  * @param {string} basketIdent - Basket identifier
  * @param {string} couponCode - Coupon code to apply
  * @returns {Promise<Object>} Updated basket
- */
+*/
 export const applyCoupon = async (basketIdent, couponCode) => {
   try {
     const isDevMode = isDevelopment && !forceProduction();
@@ -772,7 +753,7 @@ export const applyCoupon = async (basketIdent, couponCode) => {
       console.log('[Tebex] Using mock applyCoupon (development mode)');
       return getMockBasketWithCoupon(basketIdent, couponCode);
     }
-
+    
     console.log(`[Tebex] Applying coupon ${couponCode} to basket ${basketIdent}`);
     const response = await fetch(`${BASE_URL}/accounts/${STORE_TOKEN}/baskets/${basketIdent}/coupons`, {
       method: 'POST',
@@ -801,264 +782,279 @@ export const applyCoupon = async (basketIdent, couponCode) => {
     return getMockBasketWithCoupon(basketIdent, couponCode);
   }
 };
+    // function getMockAuthLinks(basketIdent, returnUrl) {
+    //   const mockBasketIdent = basketIdent || `mock-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      
+    //   // Include returnUrl in the auth URL if provided
+    //   const authUrl = returnUrl 
+    //     ? `https://auth.tebex.io/login/minecraft?basket=${mockBasketIdent}&return=${encodeURIComponent(returnUrl)}`
+    //     : `https://auth.tebex.io/login/minecraft?basket=${mockBasketIdent}`;
+        
+    //   return [
+    //     {
+    //       name: "Minecraft",
+    //       url: authUrl
+    //     }
+    //   ];
+    // }
 
-/**
- * Get mock checkout data for development and testing
- * 
- * @param {string} username - Minecraft username
- * @param {string} edition - Minecraft edition (java/bedrock)
- * @returns {Object} Mock checkout object with checkout ident for Tebex.js instead of URL
- */
-export const getMockCheckout = (username, edition = 'java') => {
-  const mockBasketIdent = `dev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+// /**
+//  * Get mock checkout data for development and testing
+//  * 
+//  * @param {string} username - Minecraft username
+//  * @param {string} edition - Minecraft edition (java/bedrock)
+//  * @returns {Object} Mock checkout object with checkout ident for Tebex.js instead of URL
+//  */
+// export const getMockCheckout = (username, edition = 'java') => {
+//   const mockBasketIdent = `dev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
   
-  return {
-    status: "success",
-    message: "Checkout ready for development mode",
-    ident: mockBasketIdent, // This is the checkout ident for Tebex.js
-    basketIdent: mockBasketIdent,
-    username: username,
-    edition: edition,
-    development_mode: true
-  };
-};
+//   return {
+//     status: "success",
+//     message: "Checkout ready for development mode",
+//     ident: mockBasketIdent, // This is the checkout ident for Tebex.js
+//     basketIdent: mockBasketIdent,
+//     username: username,
+//     edition: edition,
+//     development_mode: true
+//   };
+// };
 
-// Mock data for development and fallback
+// // Mock data for development and fallback
 
-function getMockCategories() {
-  return {
-    data: [
-      {
-        id: 1,
-        name: "Ranks",
-        slug: "ranks",
-        description: "Server ranks with various perks",
-        packages: [
-          {
-            id: "101",
-            name: "VIP Rank",
-            description: "Get VIP access with special perks",
-            image: null,
-            type: "single",
-            base_price: 9.99,
-            sales_tax: 0,
-            total_price: 9.99,
-            currency: "USD",
-            category: { id: 1, name: "Ranks" }
-          },
-          {
-            id: "102",
-            name: "MVP Rank",
-            description: "Become an MVP with premium features",
-            image: null,
-            type: "single",
-            base_price: 19.99,
-            sales_tax: 0,
-            total_price: 19.99,
-            currency: "USD",
-            category: { id: 1, name: "Ranks" }
-          }
-        ]
-      },
-      {
-        id: 2,
-        name: "Crates",
-        slug: "crates",
-        description: "Crates with random rewards",
-        packages: [
-          {
-            id: "201",
-            name: "Mystery Crate",
-            description: "Open for a chance to win rare items",
-            image: null,
-            type: "single",
-            base_price: 4.99,
-            sales_tax: 0,
-            total_price: 4.99,
-            currency: "USD",
-            category: { id: 2, name: "Crates" }
-          }
-        ]
-      }
-    ]
-  };
-}
+// function getMockCategories() {
+//   return {
+//     data: [
+//       {
+//         id: 1,
+//         name: "Ranks",
+//         slug: "ranks",
+//         description: "Server ranks with various perks",
+//         packages: [
+//           {
+//             id: "101",
+//             name: "VIP Rank",
+//             description: "Get VIP access with special perks",
+//             image: null,
+//             type: "single",
+//             base_price: 9.99,
+//             sales_tax: 0,
+//             total_price: 9.99,
+//             currency: "USD",
+//             category: { id: 1, name: "Ranks" }
+//           },
+//           {
+//             id: "102",
+//             name: "MVP Rank",
+//             description: "Become an MVP with premium features",
+//             image: null,
+//             type: "single",
+//             base_price: 19.99,
+//             sales_tax: 0,
+//             total_price: 19.99,
+//             currency: "USD",
+//             category: { id: 1, name: "Ranks" }
+//           }
+//         ]
+//       },
+//       {
+//         id: 2,
+//         name: "Crates",
+//         slug: "crates",
+//         description: "Crates with random rewards",
+//         packages: [
+//           {
+//             id: "201",
+//             name: "Mystery Crate",
+//             description: "Open for a chance to win rare items",
+//             image: null,
+//             type: "single",
+//             base_price: 4.99,
+//             sales_tax: 0,
+//             total_price: 4.99,
+//             currency: "USD",
+//             category: { id: 2, name: "Crates" }
+//           }
+//         ]
+//       }
+//     ]
+//   };
+// }
 
-function getMockPackages() {
-  return {
-    data: [
-      {
-        id: "101",
-        name: "VIP Rank",
-        description: "Get VIP access with special perks",
-        image: null,
-        type: "single",
-        base_price: 9.99,
-        sales_tax: 0,
-        total_price: 9.99,
-        currency: "USD",
-        category: { id: 1, name: "Ranks" }
-      },
-      {
-        id: "102",
-        name: "MVP Rank",
-        description: "Become an MVP with premium features",
-        image: null,
-        type: "single",
-        base_price: 19.99,
-        sales_tax: 0,
-        total_price: 19.99,
-        currency: "USD",
-        category: { id: 1, name: "Ranks" }
-      },
-      {
-        id: "201",
-        name: "Mystery Crate",
-        description: "Open for a chance to win rare items",
-        image: null,
-        type: "single",
-        base_price: 4.99,
-        sales_tax: 0,
-        total_price: 4.99,
-        currency: "USD",
-        category: { id: 2, name: "Crates" }
-      }
-    ]
-  };
-}
+// function getMockPackages() {
+//   return {
+//     data: [
+//       {
+//         id: "101",
+//         name: "VIP Rank",
+//         description: "Get VIP access with special perks",
+//         image: null,
+//         type: "single",
+//         base_price: 9.99,
+//         sales_tax: 0,
+//         total_price: 9.99,
+//         currency: "USD",
+//         category: { id: 1, name: "Ranks" }
+//       },
+//       {
+//         id: "102",
+//         name: "MVP Rank",
+//         description: "Become an MVP with premium features",
+//         image: null,
+//         type: "single",
+//         base_price: 19.99,
+//         sales_tax: 0,
+//         total_price: 19.99,
+//         currency: "USD",
+//         category: { id: 1, name: "Ranks" }
+//       },
+//       {
+//         id: "201",
+//         name: "Mystery Crate",
+//         description: "Open for a chance to win rare items",
+//         image: null,
+//         type: "single",
+//         base_price: 4.99,
+//         sales_tax: 0,
+//         total_price: 4.99,
+//         currency: "USD",
+//         category: { id: 2, name: "Crates" }
+//       }
+//     ]
+//   };
+// }
 
-function getMockBasket(completeUrl, cancelUrl) {
-  const basketIdent = `mock-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  return {
-    data: {
-      id: Date.now(),
-      ident: basketIdent,
-      complete: false,
-      email: null,
-      username: null,
-      coupons: [],
-      cancel_url: cancelUrl || window.location.href,
-      complete_url: completeUrl || window.location.href,
-      complete_auto_redirect: true,
-      country: "US",
-      base_price: 0,
-      sales_tax: 0,
-      total_price: 0,
-      currency: "USD",
-      packages: [],
-      custom: { source: "website-cart" },
-      links: {
-        payment: `https://checkout.tebex.io/api/payments/mock-${basketIdent}`,
-        checkout: `https://pay.tebex.io/${basketIdent}`
-      }
-    }
-  };
-}
+// function getMockBasket(completeUrl, cancelUrl) {
+//   const basketIdent = `mock-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+//   return {
+//     data: {
+//       id: Date.now(),
+//       ident: basketIdent,
+//       complete: false,
+//       email: null,
+//       username: null,
+//       coupons: [],
+//       cancel_url: cancelUrl || window.location.href,
+//       complete_url: completeUrl || window.location.href,
+//       complete_auto_redirect: true,
+//       country: "US",
+//       base_price: 0,
+//       sales_tax: 0,
+//       total_price: 0,
+//       currency: "USD",
+//       packages: [],
+//       custom: { source: "website-cart" },
+//       links: {
+//         payment: `https://checkout.tebex.io/api/payments/mock-${basketIdent}`,
+//         checkout: `https://pay.tebex.io/${basketIdent}`
+//       }
+//     }
+//   };
+// }
 
-function getMockBasketWithPackage(basketIdent, packageId, quantity) {
-  // Find the mock package to add to the basket
-  const mockPackages = getMockPackages();
-  let addedPackage = null;
+// function getMockBasketWithPackage(basketIdent, packageId, quantity) {
+//   // Find the mock package to add to the basket
+//   const mockPackages = getMockPackages();
+//   let addedPackage = null;
   
-  if (mockPackages && mockPackages.data && Array.isArray(mockPackages.data)) {
-    addedPackage = mockPackages.data.find(pkg => pkg.id === packageId);
-  } else if (Array.isArray(mockPackages)) {
-    addedPackage = mockPackages.find(pkg => pkg.id === packageId);
-  }
+//   if (mockPackages && mockPackages.data && Array.isArray(mockPackages.data)) {
+//     addedPackage = mockPackages.data.find(pkg => pkg.id === packageId);
+//   } else if (Array.isArray(mockPackages)) {
+//     addedPackage = mockPackages.find(pkg => pkg.id === packageId);
+//   }
   
-  // If package not found, create a placeholder
-  if (!addedPackage) {
-    addedPackage = {
-      id: packageId,
-      name: `Package ${packageId}`,
-      price: 9.99
-    };
-  }
+//   // If package not found, create a placeholder
+//   if (!addedPackage) {
+//     addedPackage = {
+//       id: packageId,
+//       name: `Package ${packageId}`,
+//       price: 9.99
+//     };
+//   }
   
-  return {
-    success: true,
-    data: {
-      ident: basketIdent || `mock-basket-${Date.now()}`,
-      packages: [
-        {
-          id: addedPackage.id,
-          name: addedPackage.name,
-          quantity: quantity,
-          total: (parseFloat(addedPackage.price) || 9.99) * quantity
-        }
-      ],
-      total: (parseFloat(addedPackage.price) || 9.99) * quantity,
-      currency: {
-        iso_4217: 'USD',
-        symbol: '$'
-      },
-      links: {
-        checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
-      }
-    }
-  };
-}
+//   return {
+//     success: true,
+//     data: {
+//       ident: basketIdent || `mock-basket-${Date.now()}`,
+//       packages: [
+//         {
+//           id: addedPackage.id,
+//           name: addedPackage.name,
+//           quantity: quantity,
+//           total: (parseFloat(addedPackage.price) || 9.99) * quantity
+//         }
+//       ],
+//       total: (parseFloat(addedPackage.price) || 9.99) * quantity,
+//       currency: {
+//         iso_4217: 'USD',
+//         symbol: '$'
+//       },
+//       links: {
+//         checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
+//       }
+//     }
+//   };
+// }
 
-function getMockBasketWithoutPackage(basketIdent, packageId) {
-  // Find the mock package to remove from the basket
-  const mockPackages = getMockPackages();
-  let removedPackage = null;
+// function getMockBasketWithoutPackage(basketIdent, packageId) {
+//   // Find the mock package to remove from the basket
+//   const mockPackages = getMockPackages();
+//   let removedPackage = null;
   
-  if (mockPackages && mockPackages.data && Array.isArray(mockPackages.data)) {
-    removedPackage = mockPackages.data.find(pkg => pkg.id === packageId);
-  } else if (Array.isArray(mockPackages)) {
-    removedPackage = mockPackages.find(pkg => pkg.id === packageId);
-  }
+//   if (mockPackages && mockPackages.data && Array.isArray(mockPackages.data)) {
+//     removedPackage = mockPackages.data.find(pkg => pkg.id === packageId);
+//   } else if (Array.isArray(mockPackages)) {
+//     removedPackage = mockPackages.find(pkg => pkg.id === packageId);
+//   }
   
-  // If package not found, create a placeholder
-  if (!removedPackage) {
-    removedPackage = {
-      id: packageId,
-      name: `Package ${packageId}`,
-      price: 9.99
-    };
-  }
+//   // If package not found, create a placeholder
+//   if (!removedPackage) {
+//     removedPackage = {
+//       id: packageId,
+//       name: `Package ${packageId}`,
+//       price: 9.99
+//     };
+//   }
   
-  return {
-    success: true,
-    data: {
-      ident: basketIdent || `mock-basket-${Date.now()}`,
-      packages: [],
-      total: 0,
-      currency: {
-        iso_4217: 'USD',
-        symbol: '$',
-      },
-      links: {
-        checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
-      }
-    }
-  };
-}
+//   return {
+//     success: true,
+//     data: {
+//       ident: basketIdent || `mock-basket-${Date.now()}`,
+//       packages: [],
+//       total: 0,
+//       currency: {
+//         iso_4217: 'USD',
+//         symbol: '$',
+//       },
+//       links: {
+//         checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
+//       }
+//     }
+//   };
+// }
 
-function getMockBasketById(basketIdent) {
-  return {
-    success: true,
-    data: {
-      ident: basketIdent || `mock-basket-${Date.now()}`,
-      packages: [],
-      total: 0,
-      currency: {
-        iso_4217: 'USD',
-        symbol: '$',
-      },
-      links: {
-        checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
-      }
-    }
-  };
-}
+// function getMockBasketById(basketIdent) {
+//   return {
+//     success: true,
+//     data: {
+//       ident: basketIdent || `mock-basket-${Date.now()}`,
+//       packages: [],
+//       total: 0,
+//       currency: {
+//         iso_4217: 'USD',
+//         symbol: '$',
+//       },
+//       links: {
+//         checkout: `https://pay.tebex.io/${basketIdent || `mock-basket-${Date.now()}`}`
+//       }
+//     }
+//   };
+// }
 
-function getMockBasketWithCoupon(basketIdent, couponCode) {
-  const mockBasket = getMockBasketWithPackage(basketIdent, "101", 1);
-  mockBasket.data.coupons = [{ coupon_code: couponCode }];
-  // Apply a fake discount
-  mockBasket.data.base_price = mockBasket.data.base_price * 0.9;
-  mockBasket.data.total_price = mockBasket.data.total_price * 0.9;
-  return mockBasket;
-} 
+// function getMockBasketWithCoupon(basketIdent, couponCode) {
+//   const mockBasket = getMockBasketWithPackage(basketIdent, "101", 1);
+//   mockBasket.data.coupons = [{ coupon_code: couponCode }];
+//   // Apply a fake discount
+//   mockBasket.data.base_price = mockBasket.data.base_price * 0.9;
+//   mockBasket.data.total_price = mockBasket.data.total_price * 0.9;
+//   return mockBasket;
+// } 

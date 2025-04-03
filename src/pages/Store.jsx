@@ -22,26 +22,7 @@ export function StoreProvider({ children }) {
   const [categoryRefreshTimestamp, setCategoryRefreshTimestamp] = useState(Date.now());
 
   // Load store categories from JSON file
-  useEffect(() => {
-    const loadStoreCategories = async () => {
-      try {
-        const response = await fetch('/store-categories.json');
-        if (!response.ok) {
-          throw new Error('Failed to load store categories');
-        }
-        
-        const data = await response.json();
-        if (data && data.categories) {
-          setCategories(data.categories);
-        }
-      } catch (error) {
-        console.error('Error loading store categories:', error);
-        setError('Failed to load store categories');
-      }
-    };
-    
-    loadStoreCategories();
-  }, []);
+ 
 
   // Load packages and categories when component mounts
   useEffect(() => {
@@ -69,19 +50,19 @@ export function StoreProvider({ children }) {
           }
           
           // Check if we received mock data in production (API fallback)
-          const isMockData = !import.meta.env.DEV && 
-                            packageData && 
-                            Array.isArray(packageData.data) && 
-                            packageData.data.some(pkg => pkg.id && pkg.id.toString().includes('mock'));
+          // const isMockData = !import.meta.env.DEV && 
+          //                   packageData && 
+          //                   Array.isArray(packageData.data) && 
+          //                   packageData.data.some(pkg => pkg.id && pkg.id.toString().includes('mock'));
           
-          if (isMockData) {
-            console.log('Detected mock data in production - API may be down');
-            setError('Store data temporarily unavailable. Showing placeholder content.');
-          }
-          
-          // Format packages for display
-          formattedPackages = formatPackagesForDisplay(packageData);
-          setPackages(formattedPackages);
+          // if (isMockData) {
+            //   console.log('Detected mock data in production - API may be down');
+            //   setError('Store data temporarily unavailable. Showing placeholder content.');
+            // }
+            
+            // Format packages for display
+            formattedPackages = formatPackagesForDisplay(packageData);
+            setPackages(formattedPackages);
           
           // Ensure formattedPackages is an array before categorizing
           if (!Array.isArray(formattedPackages)) {
@@ -91,6 +72,7 @@ export function StoreProvider({ children }) {
           
           // Categorize packages - ensure we pass an array to categorizePackages
           sortedPackages = categorizePackages(formattedPackages, fetchedCategories);
+          console.log(sortedPackages)
         } catch (packageError) {
           console.error('Error loading packages:', packageError);
           formattedPackages = [];
@@ -294,24 +276,24 @@ const getCategoryIcon = (categoryId) => {
 };
 
 // Simple check component for feature lists
-function FiCheck(props) {
-  return (
-    <svg
-      stroke="currentColor"
-      fill="none"
-      strokeWidth="2"
-      viewBox="0 0 24 24"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      height="1em"
-      width="1em"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-  );
-}
+// function FiCheck(props) {
+//   return (
+//     <svg
+//       stroke="currentColor"
+//       fill="none"
+//       strokeWidth="2"
+//       viewBox="0 0 24 24"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       height="1em"
+//       width="1em"
+//       xmlns="http://www.w3.org/2000/svg"
+//       {...props}
+//     >
+//       <polyline points="20 6 9 17 4 12"></polyline>
+//     </svg>
+//   );
+// }
 
 /**
  * Store page component displaying packages available for purchase
@@ -516,7 +498,7 @@ export default function Store() {
             <img 
               src={pkg.image} 
               alt={pkg.name} 
-              className="w-full h-48 object-cover rounded-md"
+              className="w-full h-48 object-contain rounded-md"
             />
           </div>
         )}
