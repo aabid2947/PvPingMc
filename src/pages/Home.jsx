@@ -205,7 +205,7 @@ export default function OriginMC() {
         {/* Main Content Container */}
         <div className="bg-[#13141d] w-full md:w-[60%] border border-gray-800 rounded-3xl flex flex-col items-center justify-between relative shadow-lg">
           {/* Minecraft Character - Mobile Top */}
-          <div className="md:absolute md:left-[-9rem] z-10 p-4 md:p-8 order-first md:order-none">
+          <div className="md:absolute md:left-[-9rem] md:top-[-2rem] z-10 p-4 order-first md:order-none">
             <img
               src={pngtree}
               alt="Minecraft Character"
