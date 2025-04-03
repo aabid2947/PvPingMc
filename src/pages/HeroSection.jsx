@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import blue from "../assets/blue.svg"
 import green from "../assets/green.svg"
+import PlayerGuide from "../components/PlayerGuide";
 
 export default function OriginMC() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ export default function OriginMC() {
   const [discordCount, setDiscordCount] = useState(0);
   const [isDiscordLoading, setIsDiscordLoading] = useState(true);
   const [copiedServer, setCopiedServer] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
   const location = useLocation();
@@ -218,49 +220,49 @@ export default function OriginMC() {
                 onClick={toggleMenu}
                 end
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Home</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Home</div>
               </NavLink>
               <NavLink
                 to="/blog"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Blog</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Blog</div>
               </NavLink>
               <NavLink
                 to="/vote"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Vote</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Vote</div>
               </NavLink>
               <NavLink
                 to="/originpass"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Origins Pass</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Origins Pass</div>
               </NavLink>
               <NavLink
                 to="/store"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Store</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Store</div>
               </NavLink>
               <NavLink
                 to="/rules"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">Rules</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">Rules</div>
               </NavLink>
               <NavLink
                 to="/pvpingmc"
                 className={({ isActive }) => isActive ? mobileActiveClass : mobileInactiveClass}
                 onClick={toggleMenu}
               >
-                <div className="px-4 py-3 rounded-lg hover:bg-[#1a1b26] transition-colors no-underline">PvPingMC</div>
+                <div className="px-4 py-3 rounded-lg  transition-colors no-underline">PvPingMC</div>
               </NavLink>
             </div>
           </div>
@@ -331,10 +333,10 @@ export default function OriginMC() {
         {/* Video and Ready to Play Section - Only shown on home page */}
         {isHomePage && (
           <>
-            <div className="w-full container mx-auto md:w-4/5 px-4 py-8 md:py-16 grid md:grid-cols-10 gap-8">
+            <div className="w-full container mx-auto md:w-4/5 px-4 py-8 md:py-16 grid grid-cols-1 md:grid-cols-10 gap-8 justify-center items-center text-center">
               {/* Video Section */}
-              <div className="col-span-4 relative rounded-xl overflow-hidden group  ">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 to-purple-900/30 " ></div>
+              <div className="col-span-4   relative rounded-xl overflow-hidden group  ">
+                <div className="absolute inset-0 md:inset-0 bg-gradient-to-r from-blue-900/30 to-purple-900/30 " ></div>
                 <img
                   src={Trailer}
                   alt="Gameplay Video"
@@ -393,6 +395,7 @@ export default function OriginMC() {
                     style={{
                       clipPath: "polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%)"
                     }}
+                    onClick={()=>setIsOpen(true)}
                   >
                     PLAY NOW
                   </button>
@@ -403,6 +406,7 @@ export default function OriginMC() {
             </div>
           </>)}
       </>
+      <PlayerGuide isOpen={isOpen} onClose={()=>setIsOpen(false)} />
 
     </div>
   )
