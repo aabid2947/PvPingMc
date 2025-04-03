@@ -1,7 +1,7 @@
 import React from 'react';
 import { FiInfo, FiAlertCircle, FiBookOpen } from 'react-icons/fi';
 import heroSectionBg from "../assets/herosection bg.png";
-
+import { Helmet } from 'react-helmet-async';
 // CSS for custom scrollbar
 const scrollbarStyles = `
   .custom-scrollbar::-webkit-scrollbar {
@@ -54,6 +54,9 @@ const SeverityBadge = ({ text }) => {
 const RuleItem = ({ rule, punishments }) => {
   return (
     <div className="bg-[#1A1B26] p-3 w-full rounded-lg  shadow-sm  transition-colors duration-200">
+       <Helmet>
+        <title>Rules | PvPingMC</title>
+      </Helmet>
       <div className="flex items-start w-full">
         <FiAlertCircle className="text-red-400 mt-1 mr-2 flex-shrink-0" />
         <div className="w-full">

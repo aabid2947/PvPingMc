@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import storeImg from '../assets/store.png';
 import { FiBook } from 'react-icons/fi';
-import arrow from "../assets/arrow.png";
+import { Helmet } from 'react-helmet-async';
 import { getAllPosts } from '../utils/markdown';
 
 // Blog card component with hover animation
@@ -105,6 +105,9 @@ const BlogCard = ({ post }) => {
 
   return (
     <Link to={`/blog/${post.id}`} className="block h-full">
+       <Helmet>
+        <title>Blog | PvPingMC</title>
+      </Helmet>
       <div className="bg-[#13141d] rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:transform hover:scale-102 hover:shadow-xl hover:shadow-blue-900/20 h-full flex flex-col">
         <div className="h-48 relative">
           <img 

@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import GamingSidebarMenu from "../components/originPassSideBar"
 import arrow from "../assets/arrow.png"
 import { FiAward, FiChevronRight, FiMenu, FiX } from 'react-icons/fi';
+import { Helmet } from 'react-helmet-async';
 
 export default function OriginPass() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -72,6 +73,9 @@ export default function OriginPass() {
 
   return (
     <div className="w-full bg-[#13141d] text-white min-h-screen">
+       <Helmet>
+        <title>Origin Pass | PvPingMC</title>
+      </Helmet>
       <div className="container mx-auto md:w-4/5 px-4 py-12">
         {/* Header section */}
         <div className="mb-16 flex items-center">

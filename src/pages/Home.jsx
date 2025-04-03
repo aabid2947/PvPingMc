@@ -7,7 +7,7 @@ import storeImg from "../assets/store.png";
 import arrow from "../assets/arrow.png"
 import { useNavigate } from "react-router-dom";
 import { getAllPosts } from "../utils/markdown";
-import JoinDiscord from "../components/JoinDiscord";
+import { Helmet } from 'react-helmet-async';
 import PlayerGuide from "../components/PlayerGuide";
 
 // News card component with hover animation and link to blog detail
@@ -153,7 +153,9 @@ export default function OriginMC() {
     <div className="min-h-screen bg-[#13141d] text-white mt-6  w-full">
       {/* Page Header */}
 
-
+      <Helmet>
+        <title> PvPingMC</title>
+      </Helmet>
       {/* Latest News Section */}
       <div className="w-full container mx-auto px-4 md:w-4/5 py-8">
         <div className="flex items-center gap-3 mb-8 hover:cursor-pointer">

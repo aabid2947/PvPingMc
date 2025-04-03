@@ -3,6 +3,7 @@
 import React from 'react';
 import { FiExternalLink, FiCircle, FiHelpCircle, FiGift, FiClock, FiDollarSign, FiThumbsUp } from 'react-icons/fi';
 import pvpingmc from  "../assets/pvpingmc.png"
+import { Helmet } from 'react-helmet-async';
 
 const Vote = () => {
   const votingLinks = [
@@ -14,7 +15,12 @@ const Vote = () => {
   ];
 
   return (
+
+    
     <div className="w-full bg-[#13141d] text-white min-h-screen">
+       <Helmet>
+              <title>Vote | PvPingMC</title>
+            </Helmet>
       <div className="container mx-auto md:w-4/5 px-4 py-12">
         {/* Header section */}
         <div className="mb-16 flex items-center">

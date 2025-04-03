@@ -89,7 +89,7 @@ function CartModal() {
 
   return (
     <>
-      <div className="fixed inset-0 z-40 modal-overlay bg-black bg-opacity-75 backdrop-blur-sm" onClick={handleOutsideClick}>
+      <div className="fixed inset-0 z-40 modal-overlay bg-transparent bg-opacity-75 backdrop-blur-sm" onClick={handleOutsideClick}>
         <div className="absolute top-0 right-0 h-full max-w-md w-full bg-slate-900 text-white shadow-xl transform transition-transform duration-300">
           <div className="flex justify-between items-center p-5 border-b border-gray-700">
             <h3 className="text-xl font-semibold text-white flex items-center">
