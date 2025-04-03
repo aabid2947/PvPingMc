@@ -328,7 +328,8 @@ export default function Store() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [basketError, setBasketError] = useState(null);
   const [isContextConnected, setIsContextConnected] = useState(false);
-  
+  const [loadingPackageId, setLoadingPackageId] = useState(null);
+
   // Connect the cart context to the basket context - only once
   useEffect(() => {
     if (basketContext && !isContextConnected) {
@@ -406,7 +407,7 @@ export default function Store() {
         }
         
         console.log(`Adding item to cart with valid basket ID: ${basketId}`);
-        
+        setLoadingPackageId(pkg.id);
         // Format the package data for the cart
         const cartItem = {
           id: pkg.id,
@@ -484,6 +485,7 @@ export default function Store() {
   // Render a package card
   const renderPackageCard = (pkg) => {
     const isPackageInCart = isInCart(pkg.id);
+    const isLoading = loadingPackageId === pkg.id;
     
     return (
       <div key={pkg.id} className="package-card relative bg-slate-900 rounded-lg shadow-lg p-6 border border-slate-800 hover:border-purple-500 transition-all duration-300">
@@ -531,15 +533,31 @@ export default function Store() {
           </div>
         ) : (
           <button
-            onClick={(event) => handleAddToCart(pkg, event)}
-            disabled={loading}
+          onClick={(event) => handleAddToCart(pkg, event)}
+          disabled={isLoading}
+          className={`... ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isLoading ? (
+            <div className="flex items-center justify-center w-full py-2 px-4 rounded-md font-medium  bg-purple-600 hover:bg-purple-700 text-white transition-colors ">
+              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+          ) : (
+            <>
+                <span
+           
             className={`w-full py-2 px-4 rounded-md font-medium flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white transition-colors ${
               loading ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             <FiPlus className="mr-2" />
             Add to Cart
-          </button>
+          </span>
+            </>
+          )}
+        </button>
         )}
       </div>
     );
