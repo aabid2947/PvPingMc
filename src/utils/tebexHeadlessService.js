@@ -12,7 +12,7 @@ const STORE_ID = import.meta.env.VITE_TEBEX_STORE_ID ;
 
 // Generate a unique token for the store (this should be stored in your environment variables in production)
 const STORE_TOKEN = import.meta.env.VITE_TEBEX_API_KEY ; // Use actual API key if available
-console.log(STORE_TOKEN);
+
 
 // Base URL for Tebex Headless API
 const BASE_URL = 'https://headless.tebex.io/api';
