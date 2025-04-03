@@ -1,0 +1,12 @@
+# Cloudflare Pages configuration
+[build]
+  command = "chmod +x ./cloudflare-build.sh && ./cloudflare-build.sh || node cloudflare-build.js"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18.17.0"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200 
