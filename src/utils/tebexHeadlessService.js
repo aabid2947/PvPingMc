@@ -494,6 +494,8 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
           })
         });
     
+
+        
         // Check for authentication required response (422 error)
         if (response.status === 422) {
           const errorData = await response.json();
@@ -532,18 +534,30 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
         }
     
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error(`[Tebex] Failed to add package: ${response.status} ${errorText}`);
-          throw new Error(`Failed to add package to basket: ${response.status}`);
+          let errorMessage = `Failed to add package to basket: ${response.status}`;
+        
+          try {
+            const errorJson = await response.json();
+        
+            if (errorJson?.detail) {
+              errorMessage = errorJson.detail;
+            } else if (errorJson?.title) {
+              errorMessage = errorJson.title;
+            }
+          } catch (parseError) {
+            console.warn('[Tebex] Failed to parse error response as JSON:', parseError);
+          }
+        
+          console.error('[Tebex] Failed to add package:', errorMessage);
+          throw new Error(errorMessage);
         }
         
         const data = await response.json();
         return data;
       } catch (error) {
-        console.error('[Tebex] Error adding package to basket:', error);
-        // Return mock updated basket in case of error
-        console.log('[Tebex] Falling back to mock basket with package');
-        return basketData || null; // Return existing basket data if available
+        console.error('[Tebex] Error adding package to basket:', error.message);
+        // Return mock updated basket in case of error=
+        return error.message || null; // Return existing basket data if available
       } finally {
         // Add a small delay before removing from pending requests to prevent race conditions
         setTimeout(() => {
@@ -767,7 +781,6 @@ export const processCheckout = async (basketIdent, username, edition) => {
       // Check if we have a valid basket response
       if (basketResponse?.data?.ident) {
         const checkoutIdent = basketResponse.data.ident;
-        console.log('[Tebex] Got valid basket ident for checkout:', checkoutIdent);
         
         // Return checkout data with the basket ident for Tebex.js
         return {

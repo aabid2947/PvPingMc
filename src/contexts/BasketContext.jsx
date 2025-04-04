@@ -225,7 +225,7 @@ export function BasketProvider({ children }) {
   };
   
   // Initialize a new basket if needed
-  const initializeBasket = async () => {
+  const initializeBasket = async (username) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -243,8 +243,10 @@ export function BasketProvider({ children }) {
 
       if(basketIdent) {
         // If we already have a basket, just return its ID
+
         return basketIdent;
       }
+      console.log(90)
       
       const response = await tebexService.createBasket(completeUrl, cancelUrl, username);
       
@@ -268,6 +270,8 @@ export function BasketProvider({ children }) {
       setError(error.message || 'Failed to initialize basket');
       return null;
     } finally {
+      setTimeout(() => {
+      }, 1000);
       setIsLoading(false);
     }
   };
@@ -320,7 +324,7 @@ export function BasketProvider({ children }) {
   };
   
   // Get or create a basket
-  const getOrCreateBasket = async (username=username) => {
+  const getOrCreateBasket = async (username) => {
     // Don't allow basket creation without a username
     if (!username) {
       console.warn('Cannot create basket: No username set');
@@ -356,7 +360,7 @@ export function BasketProvider({ children }) {
     } else {
       console.log('No basket ID exists, creating a new one');
       // No basket exists, create a new one
-      const newBasketId = await initializeBasket();
+      const newBasketId = await initializeBasket(username);
       if (newBasketId) {
         setHasInitializedBasket(true);
       }
@@ -448,7 +452,7 @@ export function BasketProvider({ children }) {
         return response.data;
       } else {
         console.error('Failed to add package to basket - empty response:', response);
-        throw new Error('Failed to add package to basket');
+        return response;
       }
     } catch (error) {
       console.error('Error adding package to basket:', error);
@@ -701,7 +705,7 @@ export function BasketProvider({ children }) {
       
       
       // Create a new basket
-      return await initializeBasket();
+      return await initializeBasket(username);
     } catch (error) {
       console.error('Error resetting basket:', error);
       setError('Failed to reset basket');

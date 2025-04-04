@@ -429,6 +429,12 @@ export default function Store() {
           const addResult = await basketContext.addPackageToBasket(pkg.id, 1);
           
           // If this succeeds (no auth redirect), add to cart
+          if(addResult == "There are required packages you do not own") {
+            setBasketError('You do not own the required packages to purchase this package.');
+            setLoadingPackageId(false)
+            return;
+          }
+
           if (addResult) {
             addToCart(cartItem);
           } else {

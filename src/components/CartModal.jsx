@@ -27,6 +27,7 @@ function CartModal() {
     basketIdent,
     getPackagesTotal,
     deleteBasket,
+    resetBasket
   } = useBasket();
   
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -35,7 +36,6 @@ function CartModal() {
   
   // Check if user just logged in based on URL parameter
   useEffect(() => {
-    console.log(basketData)
     const queryParams = new URLSearchParams(window.location.search);
     const justLoggedInParam = queryParams.get('just_logged_in');
     
@@ -84,15 +84,15 @@ function CartModal() {
   // Handle checkout button click
   const handleCheckout = () => {
     // Check if the cart is empty
-    if (cart.length === 0) {
-      return;
-    }
+
     
     // Show the checkout modal
     setShowCheckoutModal(true);
   };
 
   const handleLogout = () => {
+    try {
+      // Optionally, you can also clear the basket on the server
     // Clear all user-related data
     logout(); 
     // Clear cart state
@@ -102,7 +102,28 @@ function CartModal() {
     // Close cart modal
     closeCart();
     // Optional: Delete basket from server if needed
+    // Reload the page to reflect changes
+    window.location.reload();
+    }
+    catch (error) {
+      console.warn('Error during logout:', error);
+    }
     
+  };
+
+  const handleClearCart = () => {
+    try{
+      clearCart();
+      // Optionally, you can also clear the basket on the server
+      // await deleteBasket();
+       resetBasket();  
+      //  reload the page to reflect changes
+      window.location.reload();
+
+    } 
+    catch (error) {   
+      console.warn('Error clearing cart:', error);
+    }
   };
   
   // Handle closing the checkout modal
@@ -262,7 +283,7 @@ function CartModal() {
                   
                   <div className="grid grid-cols-2 gap-3">
                     <button
-                      onClick={clearCart}
+                      onClick={handleClearCart}
                       className="py-2 px-4 rounded-md text-gray-300 bg-slate-800 hover:bg-slate-700 transition-colors duration-200"
                     >
                       Clear Cart

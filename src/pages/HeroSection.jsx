@@ -1,7 +1,7 @@
 import React from "react"
 import pvping from "../assets/thumb_logo.png"
 import { Link, NavLink, useLocation } from "react-router-dom"
-import { Play, Menu, X, Copy, ExternalLink, ChevronDown } from "lucide-react"
+import { Play, Menu, X, Copy, ExternalLink, ChevronRight } from "lucide-react"
 import Trailer from "../assets/trailer.png";
 import heroSectionBg from "../assets/herosection bg.png";
 import { useState, useEffect, useRef } from "react";
@@ -9,6 +9,9 @@ import axios from "axios";
 import blue from "../assets/blue.svg"
 import green from "../assets/green.svg"
 import PlayerGuide from "../components/PlayerGuide";
+import { useUser } from "../context/UserContext";
+import { useBasket } from "../contexts/BasketContext";
+import { useCart } from "../contexts/CartContext";
 
 export default function OriginMC() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,6 +24,9 @@ export default function OriginMC() {
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
   const location = useLocation();
+  const {logout,username} = useUser();
+  const {deleteBasket} = useBasket();
+  const {clearCart} = useCart();
 
   // Check if we're on the home page
   const isHomePage = location.pathname === '/';
@@ -117,6 +123,25 @@ export default function OriginMC() {
     };
   }, []);
 
+  const handleLogout = () => {
+    if(!username){
+
+      // Perform logout logic here
+      // For example, clear user data, redirect to login page, etc. 
+      // Clear the basket and cart  
+      deleteBasket();
+      clearCart();
+      // Call the logout function from UserContext
+      logout(); 
+      // reload the page to reflect the logout
+      window.location.reload();
+      console.log("User logged out"); 
+    }
+    else{
+      console.log("User is not logged in");
+    }
+  }
+
   // Helper function to determine if a link is active
   const isActive = (path) => {
     if (path === '/') {
@@ -194,9 +219,9 @@ export default function OriginMC() {
             Rules
           </NavLink>
           <div className="relative group">
-            <Link to="#" className="hover:text-blue-400 text  transition-colors flex items-center font-medium">
-              More <ChevronDown className="text-[#3ABCFD] h-5 w-5 font-extrabold ml-1" />
-            </Link>
+            <button onClick={handleLogout} className="hover:text-blue-400 text  transition-colors flex items-center font-medium">
+              Log Out <ChevronRight className="text-[#3ABCFD] h-5 w-5 font-extrabold ml-1" />
+            </button>
           </div>
         </div>
 

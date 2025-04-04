@@ -249,17 +249,7 @@ const BlogOverview = () => {
             </div>
             
             {/* Debug Information (only in development) */}
-            {process.env.NODE_ENV === 'development' && debugInfo && (
-              <div className="mt-10 p-4 bg-gray-800 rounded-lg text-xs overflow-auto">
-                <h3 className="text-white font-bold mb-2">Debug Info</h3>
-                <p>Posts loaded: {debugInfo.count}</p>
-                <p>Fetch time: {debugInfo.fetchTime}ms</p>
-                <details>
-                  <summary className="cursor-pointer text-blue-400">Post List</summary>
-                  <pre className="mt-2 text-gray-400 overflow-x-auto">{JSON.stringify(debugInfo.posts, null, 2)}</pre>
-                </details>
-              </div>
-            )}
+           
           </>
         )}
       </div>
