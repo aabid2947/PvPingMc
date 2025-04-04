@@ -337,7 +337,6 @@ export default function Store() {
   // Connect the cart context to the basket context - only once
   useEffect(() => {
     if (basketContext && !isContextConnected) {
-      console.log(basketContext.basketData)
       connectToBasketContext(basketContext);
       setIsContextConnected(true);
     }
@@ -405,7 +404,6 @@ export default function Store() {
         const basketId = await basketContext.getOrCreateBasket();
         
         if (!basketId) {
-          console.error('Failed to get or create basket');
           setBasketError('Failed to initialize your shopping cart. Please try again.');
           return;
         }
@@ -423,7 +421,7 @@ export default function Store() {
         // Add to cart (this will trigger the pending operations in CartContext)
         try {
           // First try to add the package to the basket
-          console.log
+        
           const addResult = await basketContext.addPackageToBasket(pkg.id, 1);
           
           // If this succeeds (no auth redirect), add to cart
