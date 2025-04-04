@@ -165,8 +165,6 @@ export const fetchPackages = async () => {
           }
         });
       }
-      
-      console.log(`[Tebex] Extracted ${extractedPackages.data.length} packages from categories`);
     } catch (processingError) {
       console.error('[Tebex] Error processing categories data:', processingError);
       return getMockPackages();
@@ -202,7 +200,6 @@ export const createBasket = async (completeUrl, cancelUrl, username) => {
     
     // Check for duplicate requests first
     if (pendingCreateBasketRequest[requestKey]) {
-      console.log('[Tebex] Basket creation already in progress, reusing request', requestKey);
       return pendingCreateBasketRequest[requestKey];
     }
 
@@ -216,8 +213,6 @@ export const createBasket = async (completeUrl, cancelUrl, username) => {
           console.log('[Tebex] Using mock basket in development mode');
           return getMockBasket(completeUrl, cancelUrl);
         }
-
-        console.log('[Tebex] Creating real basket with Tebex API:', username);
         const response = await fetch(`${BASE_URL}/accounts/${STORE_TOKEN}/baskets`, {
           method: 'POST',
           headers: {
@@ -251,7 +246,6 @@ export const createBasket = async (completeUrl, cancelUrl, username) => {
       } finally {
         // Cleanup with delay to prevent race conditions
         setTimeout(() => {
-          console.log('[Tebex] Clearing pending basket creation request:', requestKey);
           delete pendingCreateBasketRequest[requestKey];
         }, 1000);
       }
@@ -299,7 +293,6 @@ export const storePendingBasketOperation = (operation) => {
       localStorage.setItem(PENDING_RETURN_URL_KEY, operation.returnUrl);
     }
     
-    console.log('[Tebex] Stored pending basket operation:', operation);
   } catch (error) {
     console.error('[Tebex] Error storing pending basket operation:', error);
   }
@@ -324,7 +317,6 @@ export const getPendingBasketOperation = () => {
       returnUrl: localStorage.getItem(PENDING_RETURN_URL_KEY)
     };
     
-    console.log('[Tebex] Retrieved pending basket operation:', operation);
     return operation;
   } catch (error) {
     console.error('[Tebex] Error retrieving pending basket operation:', error);
@@ -375,7 +367,6 @@ export const handleAuthenticationReturn = async () => {
     
     // Parse the pending operation
     const pendingOperation = JSON.parse(pendingOpData);
-    console.log('[Tebex] Processing pending operation after authentication:', pendingOperation);
     
     let result = null;
     
@@ -463,7 +454,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
     // IMPORTANT: Check for ongoing requests BEFORE checking if package exists in basket
     // This ensures we don't make duplicate API calls even during rapid function calls
     if (pendingRequests[requestKey]) {
-      console.log('[Tebex] Request already in progress, waiting for completion...', requestKey);
       return pendingRequests[requestKey]; // Return the existing promise
     }
     
@@ -477,7 +467,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
       );
       
       if (existingPackage) {
-        console.log('[Tebex] Package already in basket, skipping API call', packageId);
         return Promise.resolve(basketData); // Return current basket data as a resolved promise
       }
     }
@@ -491,7 +480,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
     // Create the promise for this request and store it in pendingRequests
     // IMPORTANT: Wrap the ENTIRE execution in the stored promise
     pendingRequests[requestKey] = (async () => {
-      console.log('[Tebex] Starting API request for package:', packageId);
       
       try {
         const response = await fetch(`${BASE_URL}/baskets/${basketIdent}/packages`, {
@@ -529,7 +517,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
             const authLinks = await getBasketAuthLinks(basketIdent, returnUrl);
             
             if (authLinks && authLinks.length > 0) {
-              console.log('[Tebex] Redirecting to authentication page:', authLinks[0].url);
               
               // Return special object indicating auth redirect
               return {
@@ -551,7 +538,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
         }
         
         const data = await response.json();
-        console.log('[Tebex] Package added successfully:', packageId);
         return data;
       } catch (error) {
         console.error('[Tebex] Error adding package to basket:', error);
@@ -561,7 +547,6 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
       } finally {
         // Add a small delay before removing from pending requests to prevent race conditions
         setTimeout(() => {
-          console.log('[Tebex] Clearing pending request for:', requestKey);
           delete pendingRequests[requestKey];
         }, 500);
       }
@@ -590,8 +575,6 @@ export const removePackageFromBasket = async (basketIdent, packageId, returnUrl 
       console.log('[Tebex] Using mock removePackageFromBasket (development mode)');
       return getMockBasketWithoutPackage(basketIdent, packageId);
     }
-
-    console.log(`[Tebex] Removing package ${packageId} from basket ${basketIdent}`);
     const response = await fetch(`${BASE_URL}/baskets/${basketIdent}/packages/remove`, {
       method: 'POST',
       headers: {
@@ -625,7 +608,6 @@ export const removePackageFromBasket = async (basketIdent, packageId, returnUrl 
         const authLinks = await getBasketAuthLinks(basketIdent, returnUrl);
         
         if (authLinks && authLinks.length > 0) {
-          console.log('[Tebex] Redirecting to authentication page:', authLinks[0].url);
           
           // Return special object indicating auth redirect
           return {
@@ -727,7 +709,6 @@ export const getBasketAuthLinks = async (basketIdent, returnUrl = window.locatio
       return getMockAuthLinks(basketIdent, returnUrl);
     }
 
-    console.log(`[Tebex] Getting auth links for basket ${basketIdent} with return URL ${returnUrl}`);
     
     // Encode returnUrl properly
     const encodedReturnUrl = encodeURIComponent(returnUrl);
@@ -743,7 +724,6 @@ export const getBasketAuthLinks = async (basketIdent, returnUrl = window.locatio
     }
     
     const data = await response.json();
-    console.log('[Tebex] Successfully retrieved auth links:', data);
     return data;
   } catch (error) {
     console.error('[Tebex] Error getting auth links:', error);
@@ -832,7 +812,6 @@ export const applyCoupon = async (basketIdent, couponCode) => {
       return getMockBasketWithCoupon(basketIdent, couponCode);
     }
     
-    console.log(`[Tebex] Applying coupon ${couponCode} to basket ${basketIdent}`);
     const response = await fetch(`${BASE_URL}/accounts/${STORE_TOKEN}/baskets/${basketIdent}/coupons`, {
       method: 'POST',
       headers: {
@@ -890,7 +869,6 @@ export const deleteBasket = async (basketIdent) => {
       throw new Error(errorData.error_message || 'Failed to delete basket');
     }
 
-    console.log(`[Tebex] Successfully deleted basket ${basketIdent}`);
     return {
       success: true,
       message: "Basket deleted successfully",
