@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+// import { useBasket } from './BasketContext'; // Import the BasketContext
 
 const CartContext = createContext();
 
@@ -28,13 +29,12 @@ export function CartProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem('shoppingCart', JSON.stringify(cart));
-      console.log('Cart saved to localStorage:', cart.length, 'items');
     } catch (error) {
       console.error('Error saving cart to localStorage:', error);
     }
   }, [cart]);
   
-  // Process any pending basket operations
+  // // Process any pending basket operations
   useEffect(() => {
     const processPendingOperations = async () => {
       // If we have no pending operations, return
@@ -52,11 +52,7 @@ export function CartProvider({ children }) {
           if (useBasket) {
             try {
               basketContext = useBasket();
-              console.log('BasketContext connected in CartContext:', {
-                hasUsername: !!basketContext.username,
-                hasBasketIdent: !!basketContext.basketIdent,
-                hasInitializedBasket: basketContext.hasInitializedBasket
-              });
+             
             } catch (error) {
               console.warn('BasketContext not yet available, will retry');
               return; // Will retry on next render
@@ -124,15 +120,12 @@ export function CartProvider({ children }) {
                                    currentBasket.packages.some(pkg => pkg.id === op.itemId);
             
             if (alreadyInBasket) {
-              console.log(`Item ${op.itemId} already in basket, skipping add operation`);
             } else {
               // Item not in basket, add it
               await basketContext.addPackageToBasket(op.itemId, 1);
-              console.log(`Successfully added item ${op.itemId} to Tebex basket`);
             }
           } else if (op.type === 'remove') {
             await basketContext.removePackageFromBasket(op.itemId);
-            console.log(`Successfully removed item ${op.itemId} from Tebex basket`);
           }
         } catch (error) {
           console.error(`Failed to process basket operation ${op.type} for item ${op.itemId}:`, error);
@@ -143,6 +136,33 @@ export function CartProvider({ children }) {
     processPendingOperations();
   }, [pendingBasketOperations]);
   
+  // sync from basket context
+  const syncFromBasketContext = () => {
+    try {
+      if (basketContext && basketContext.basketData && basketContext.basketData.packages) {
+        const newCart = basketContext.basketData.packages.map(pkg => ({
+          id: pkg.id,
+          name: pkg.name,
+          price: pkg.price,
+          description: pkg.description,
+          category: pkg.category,
+          image: pkg.image,
+          url: pkg.url
+        }));
+        
+        setCart(newCart);
+      }
+    } catch (error) {
+      console.error('Error synchronizing cart from BasketContext:', error);
+    }
+  };
+  // Sync cart with basket context on initial render
+  useEffect(() => {
+    if (basketContext && basketContext.basketData && basketContext.basketData.packages) {
+      syncFromBasketContext();
+    }
+  }
+  , [basketContext]);
   // Add an item to the cart
   const addToCart = (item) => {
     if (!item || !item.id) {
@@ -156,11 +176,9 @@ export function CartProvider({ children }) {
       
       if (itemExists) {
         // Item already exists, no need to add it again
-        console.log(`Item ${item.id} already in cart, not adding again`);
         return prevCart;
       } else {
         // Add the new item to the cart
-        console.log(`Adding item ${item.id} to cart`);
         
         // Queue this item to be added to the Tebex basket
         setPendingBasketOperations(prev => [
@@ -183,7 +201,6 @@ export function CartProvider({ children }) {
       return;
     }
     
-    console.log(`Removing item ${itemId} from cart`);
     
     // Queue this item to be removed from the Tebex basket
     setPendingBasketOperations(prev => [
@@ -196,16 +213,26 @@ export function CartProvider({ children }) {
   
   // Clear the entire cart
   const clearCart = () => {
-    console.log('Clearing cart');
     setCart([]);
     // Don't clear the Tebex basket here - that's handled separately during checkout
   };
   
   // Calculate the total price of items in the cart
   const getCartTotal = () => {
-    return cart.reduce((total, item) => {
-      // Extract numeric price from formatted price string (e.g., "$9.99" -> 9.99)
-      const numericPrice = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+    return basketData.packages.reduce((total, item) => {
+      // Handle undefined/null prices and non-string values
+      const priceString = String(item.price || '');
+      
+      // Extract the numerical value safely
+      const numericValue = parseFloat(
+        priceString
+          .replace(/[^0-9.]/g, '')  // Remove non-numeric characters
+          .replace(/(\..*)\./g, '$1') // Remove extra decimals
+      );
+  
+      // Ensure we have a valid number
+      const numericPrice = Number.isFinite(numericValue) ? numericValue : 0;
+      
       return total + numericPrice;
     }, 0).toFixed(2);
   };
@@ -233,11 +260,7 @@ export function CartProvider({ children }) {
   // Connect to the basket context
   const connectToBasketContext = (context) => {
     basketContext = context;
-    console.log('CartContext connected to BasketContext:', {
-      hasUsername: !!context.username, 
-      hasBasketIdent: !!context.basketIdent,
-      hasInitializedBasket: context.hasInitializedBasket
-    });
+    
   };
   
   // Context value

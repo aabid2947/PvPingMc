@@ -219,8 +219,7 @@ export const createBasket = async (completeUrl, cancelUrl,username) => {
 
       
     });
-
-    console.log(response.json);
+;
 
 
     if (!response.ok) {
@@ -230,7 +229,6 @@ export const createBasket = async (completeUrl, cancelUrl,username) => {
     }
     
     const data = await response.json();
-    console.log('[Tebex] Basket created successfully:', data);
     return data;
   } catch (error) {
     console.error('[Tebex] Error creating basket:', error);
@@ -420,7 +418,7 @@ export const handleAuthenticationReturn = async () => {
  * @param {number} quantity - Quantity of the package
  * @returns {Promise<Object>} Updated basket
  */
-export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, returnUrl = window.location.href) => {
+export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, returnUrl = window.location.href,basketData) => {
   try {
     const isDevMode = isDevelopment && !forceProduction();
     
@@ -428,8 +426,8 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
       console.log('[Tebex] Using mock addPackageToBasket (development mode)');
       return getMockBasketWithPackage(basketIdent, packageId, quantity);
     }
-
-    console.log(`[Tebex] Adding package ${packageId} to basket ${basketIdent}`);
+    
+    
     const response = await fetch(`${BASE_URL}/baskets/${basketIdent}/packages`, {
       method: 'POST',
       headers: {
@@ -493,7 +491,7 @@ export const addPackageToBasket = async (basketIdent, packageId, quantity = 1, r
     console.error('[Tebex] Error adding package to basket:', error);
     // Return mock updated basket in case of error
     console.log('[Tebex] Falling back to mock basket with package');
-    return getMockBasketWithPackage(basketIdent, packageId, quantity);
+    return null;
   }
 };
 

@@ -23,7 +23,9 @@ function CartModal() {
     isLoading: basketLoading,
     lastAddedItem,
     syncCartWithBasket,
-    basketIdent
+    basketData,
+    basketIdent,
+    getPackagesTotal
   } = useBasket();
   
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -32,6 +34,7 @@ function CartModal() {
   
   // Check if user just logged in based on URL parameter
   useEffect(() => {
+    console.log(basketData)
     const queryParams = new URLSearchParams(window.location.search);
     const justLoggedInParam = queryParams.get('just_logged_in');
     
@@ -44,6 +47,14 @@ function CartModal() {
       }, 5000);
     }
   }, []);
+
+  // Sync cart with basket on mount
+  useEffect(() => {
+    if (cartOpen && basketData && basketData.basketId) {
+      // Sync cart with basket if the basket ID is available
+      syncCartWithBasket();
+    }
+  }, [cartOpen, basketData]);
   
   // Handle manual basket sync
   const handleManualSync = async () => {
@@ -202,7 +213,7 @@ function CartModal() {
             ) : (
               <>
                 <div className="space-y-4">
-                  {cart.map((item) => (
+                  {basketData.packages.map((item) => (
                     <div
                       key={item.id}
                       className="flex items-center p-3 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors duration-200"
@@ -232,7 +243,7 @@ function CartModal() {
                 <div className="mt-6 pt-4 border-t border-gray-700">
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-gray-300">Total:</span>
-                    <span className="text-xl font-bold text-white">${getCartTotal()}</span>
+                    <span className="text-xl font-bold text-white">${getPackagesTotal()}</span>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3">

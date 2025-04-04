@@ -20,12 +20,15 @@ export function StoreProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categoryRefreshTimestamp, setCategoryRefreshTimestamp] = useState(Date.now());
+  
 
   // Load store categories from JSON file
  
 
   // Load packages and categories when component mounts
   useEffect(() => {
+
+    console.log('Loading packages and categories...');
     const loadPackagesAndCategories = async () => {
       setLoading(true);
       setError(null);
@@ -33,6 +36,7 @@ export function StoreProvider({ children }) {
       try {
         // Step 1: Fetch categories
         const fetchedCategories = await fetchCategories();
+     
         setCategories(fetchedCategories);
         
         // Step 2: Fetch packages
@@ -41,7 +45,6 @@ export function StoreProvider({ children }) {
         let sortedPackages = {};
         
         try {
-          console.log('Fetching packages from Tebex API...');
           packageData = await tebexHeadlessService.fetchPackages();
           
           if (!packageData) {
@@ -72,7 +75,7 @@ export function StoreProvider({ children }) {
           
           // Categorize packages - ensure we pass an array to categorizePackages
           sortedPackages = categorizePackages(formattedPackages, fetchedCategories);
-          console.log(sortedPackages)
+   
         } catch (packageError) {
           console.error('Error loading packages:', packageError);
           formattedPackages = [];
@@ -113,6 +116,7 @@ export function StoreProvider({ children }) {
   // Refresh categories on demand
   const refreshCategories = async () => {
     try {
+      
       const freshCategories = await fetchCategories();
       setCategories(freshCategories);
       
@@ -128,7 +132,7 @@ export function StoreProvider({ children }) {
       setCategorizedPackages(sortedPackages);
       
       // Update timestamp to trigger reload if needed
-      setCategoryRefreshTimestamp(Date.now());
+      // setCategoryRefreshTimestamp(Date.now());
       
       return true;
     } catch (error) {
@@ -333,8 +337,8 @@ export default function Store() {
   // Connect the cart context to the basket context - only once
   useEffect(() => {
     if (basketContext && !isContextConnected) {
+      console.log(basketContext.basketData)
       connectToBasketContext(basketContext);
-      console.log('Connected Cart context to Basket context');
       setIsContextConnected(true);
     }
   }, [basketContext, connectToBasketContext, isContextConnected]);
@@ -406,7 +410,6 @@ export default function Store() {
           return;
         }
         
-        console.log(`Adding item to cart with valid basket ID: ${basketId}`);
         setLoadingPackageId(pkg.id);
         // Format the package data for the cart
         const cartItem = {
@@ -420,11 +423,11 @@ export default function Store() {
         // Add to cart (this will trigger the pending operations in CartContext)
         try {
           // First try to add the package to the basket
+          console.log
           const addResult = await basketContext.addPackageToBasket(pkg.id, 1);
           
           // If this succeeds (no auth redirect), add to cart
           if (addResult) {
-            console.log('Package added to basket, adding to cart:', cartItem);
             addToCart(cartItem);
           } else {
             console.log('Package not added to cart - possible auth redirect or error');

@@ -65,6 +65,7 @@ export function BasketProvider({ children }) {
   const [developmentCheckout, setDevelopmentCheckout] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState(null);
   const [lastFetchTimestamp, setLastFetchTimestamp] = useState(0);
+  const [basketOpen, setBasketOpen] = useState(false);
   const FETCH_COOLDOWN = 2000; // 2 seconds cooldown between fetches
   
   // Helper function to save basket state to localStorage
@@ -87,7 +88,6 @@ export function BasketProvider({ children }) {
       localStorage.removeItem(BASKET_DATA_KEY);
       localStorage.removeItem(BASKET_USERNAME_KEY);
       localStorage.removeItem(BASKET_INITIALIZED_KEY);
-      console.log('Basket state cleared from localStorage');
     } catch (error) {
       console.error('Error clearing basket state from localStorage:', error);
     }
@@ -153,7 +153,6 @@ export function BasketProvider({ children }) {
                             window.location.search.includes('auth_return');
         
         if (isAuthReturn) {
-          console.log('Detected return from Tebex authentication');
           setIsLoading(true);
           
           // Process the pending operation that was stored before redirect
@@ -166,7 +165,6 @@ export function BasketProvider({ children }) {
               if (operation.type === 'add_package' && operation.basketIdent && operation.packageId) {
                 // Re-attempt to add the package now that user is authenticated
                 await addPackageToBasket(operation.packageId, operation.quantity || 1);
-                console.log('Successfully completed operation after authentication');
                 
                 // Clear the pending operation
                 localStorage.removeItem('tebex_pending_operation');
@@ -233,7 +231,6 @@ export function BasketProvider({ children }) {
         return null;
       }
       
-      console.log('Initializing new Tebex basket...');
       
       // Complete URL and cancel URL default to current page
       const completeUrl = window.location.href;
@@ -275,7 +272,6 @@ export function BasketProvider({ children }) {
     // Check if we fetched recently to prevent redundant calls
     const now = Date.now();
     if (now - lastFetchTimestamp < FETCH_COOLDOWN) {
-      console.log(`Skipping basket fetch, last fetch was ${now - lastFetchTimestamp}ms ago`);
       return basketData; // Return existing data if we have it
     }
     
@@ -340,7 +336,6 @@ export function BasketProvider({ children }) {
         console.error('Error verifying existing basket:', error);
       }
       
-      console.log('Existing basket is invalid, creating a new one');
       // If we couldn't fetch the basket, create a new one
       const newBasketId = await initializeBasket();
       if (newBasketId) {
@@ -396,14 +391,21 @@ export function BasketProvider({ children }) {
       
       // Set return URL to current page
       const returnUrl = window.location.href;
-      
+      console.log(packageId, quantity, returnUrl);
       // Add the package to the basket
       const response = await tebexService.addPackageToBasket(
         currentBasketIdent, 
         packageId, 
         quantity,
-        returnUrl
+        returnUrl,
+        basketData
       );
+      
+      if(response.status == "exists") {
+        // Package already exists in the basket, no need to add it again
+        console.log('Package already exists in the basket');
+        return basketData;
+      }
       
       // Check if authentication is required
       if (response && response.requires_auth && response.auth_url) {
@@ -627,38 +629,38 @@ export function BasketProvider({ children }) {
   };
   
   // Apply a coupon to the basket
-  const applyCoupon = async (couponCode) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // const applyCoupon = async (couponCode) => {
+  //   try {
+  //     setIsLoading(true);
+  //     setError(null);
       
-      // Ensure we have a valid basket
-      const currentBasketIdent = await getOrCreateBasket();
-      if (!currentBasketIdent) {
-        throw new Error('Could not create or fetch basket');
-      }
+  //     // Ensure we have a valid basket
+  //     const currentBasketIdent = await getOrCreateBasket();
+  //     if (!currentBasketIdent) {
+  //       throw new Error('Could not create or fetch basket');
+  //     }
       
-      // Apply the coupon
-      const response = await tebexService.applyCoupon(currentBasketIdent, couponCode);
+  //     // Apply the coupon
+  //     const response = await tebexService.applyCoupon(currentBasketIdent, couponCode);
       
-      if (response?.data) {
-        setBasketData(response.data);
+  //     if (response?.data) {
+  //       setBasketData(response.data);
         
-        // Save updated basket data to localStorage
-        saveBasketState(currentBasketIdent, response.data, username, true);
+  //       // Save updated basket data to localStorage
+  //       saveBasketState(currentBasketIdent, response.data, username, true);
         
-        return response.data;
-      } else {
-        throw new Error('Failed to apply coupon');
-      }
-    } catch (error) {
-      console.error('Error applying coupon:', error);
-      setError(error.message || 'Failed to apply coupon');
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //       return response.data;
+  //     } else {
+  //       throw new Error('Failed to apply coupon');
+  //     }
+  //   } catch (error) {
+  //     console.error('Error applying coupon:', error);
+  //     setError(error.message || 'Failed to apply coupon');
+  //     return null;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   
   // Clear the basket and create a new one
   const resetBasket = async () => {
@@ -677,7 +679,6 @@ export function BasketProvider({ children }) {
       setBasketData(null);
       setHasInitializedBasket(false);
       
-      console.log('Basket reset successful, creating a new one');
       
       // Create a new basket
       return await initializeBasket();
@@ -690,6 +691,30 @@ export function BasketProvider({ children }) {
     }
   };
   
+  // Open the cart modal
+  const openBasket = () => {
+    setBasketOpen(true);
+  };
+
+
+  const getPackagesTotal = () => {
+    return basketData.packages.reduce((total, item) => {
+      // Handle undefined/null prices and non-string values
+      const priceString = String(item.in_basket.price || '');
+      
+      // Extract the numerical value safely
+      const numericValue = parseFloat(
+        priceString
+          .replace(/[^0-9.]/g, '')  // Remove non-numeric characters
+          .replace(/(\..*)\./g, '$1') // Remove extra decimals
+      );
+  
+      // Ensure we have a valid number
+      const numericPrice = Number.isFinite(numericValue) ? numericValue : 0;
+      
+      return total + numericPrice;
+    }, 0).toFixed(2);
+  };
   // Value to be provided by context
   const value = {
     basketIdent,
@@ -706,13 +731,14 @@ export function BasketProvider({ children }) {
     addPackageToBasket,
     removePackageFromBasket,
     checkoutCart,
-    applyCoupon,
     resetBasket,
     getBasketAuthLinks,
     syncCartWithBasket,
     forceProductionMode,
     resetToDevelopmentMode,
     username,
+    getPackagesTotal,
+    openBasket,
     hasInitializedBasket
   };
   

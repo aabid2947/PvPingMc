@@ -163,108 +163,108 @@ export function categorizePackages(packages = [], categories = []) {
  * Each mock package includes id, name, description, price, features, and popular flag
  * @returns {Array} Array of package objects
  */
-export function getMockPackages() {
-  return [
-    {
-      id: '3307111',
-      name: 'VIP Membership',
-      description: 'Get access to exclusive features and benefits with our VIP membership.',
-      price: '$9.99',
-      features: [
-        'VIP tag in-game and on Discord',
-        'Access to VIP-only areas and commands',
-        'Priority server access during high traffic',
-        '10% discount on future purchases'
-      ],
-      popular: true,
-      category: 'vip-packages'
-    },
-    {
-      id: '3307112',
-      name: 'Premium Starter Kit',
-      description: 'Get a head start with premium tools, weapons, and resources.',
-      price: '$4.99',
-      features: [
-        'Diamond tools and armor set',
-        '64x of various valuable resources',
-        '3 exclusive mystery crates',
-        'Special particle effects for 7 days'
-      ],
-      popular: false,
-      category: 'vip-packages'
-    },
-    {
-      id: '3307114',
-      name: 'Ultimate Bundle',
-      description: 'The complete package with all benefits and perks combined.',
-      price: '$19.99',
-      features: [
-        'VIP membership for 30 days',
-        'Premium starter kit with double resources',
-        'Exclusive cosmetic items and effects',
-        '5 vote keys and 3 legendary crates'
-      ],
-      popular: true,
-      category: 'game-boosts'
-    },
-    {
-      id: '3307115',
-      name: 'Fly Pass',
-      description: 'Enjoy the ability to fly around the map.',
-      price: '$7.99',
-      features: [
-        'Ability to fly in survival mode',
-        '7 days of flight time',
-        'Auto-renewal option',
-        'Works in all non-restricted zones'
-      ],
-      popular: false,
-      category: 'game-boosts'
-    },
-    {
-      id: '3307116',
-      name: 'Enchantment Bundle',
-      description: 'Access to rare and powerful enchantments.',
-      price: '$12.99',
-      features: [
-        '5 custom enchantment books',
-        'Ability to apply higher level enchantments',
-        'Access to exclusive enchantment table',
-        '1 legendary enchantment scroll'
-      ],
-      popular: false,
-      category: 'game-boosts'
-    },
-    {
-      id: '3307117',
-      name: 'Weekly Crate Keys',
-      description: 'Get weekly delivery of crate keys for a month.',
-      price: '$14.99',
-      features: [
-        '5 crate keys delivered weekly',
-        'Access to special weekly rewards',
-        'Chance for rare and exclusive items',
-        'Automatic delivery for 4 weeks'
-      ],
-      popular: false,
-      category: 'game-boosts'
-    },
-    {
-      id: '3307118',
-      name: 'Economy Booster',
-      description: 'Boost your in-game economy with this package.',
-      price: '$9.99',
-      features: [
-        'Starting cash bonus of 10,000 coins',
-        'Double earnings from all jobs for 7 days',
-        '3 money pouches with random amounts',
-        'Access to special merchant with discounted prices'
-      ],
-      popular: false,
-      category: 'game-boosts'
-    }
-  ];
-}
+// export function getMockPackages() {
+//   return [
+//     {
+//       id: '3307111',
+//       name: 'VIP Membership',
+//       description: 'Get access to exclusive features and benefits with our VIP membership.',
+//       price: '$9.99',
+//       features: [
+//         'VIP tag in-game and on Discord',
+//         'Access to VIP-only areas and commands',
+//         'Priority server access during high traffic',
+//         '10% discount on future purchases'
+//       ],
+//       popular: true,
+//       category: 'vip-packages'
+//     },
+//     {
+//       id: '3307112',
+//       name: 'Premium Starter Kit',
+//       description: 'Get a head start with premium tools, weapons, and resources.',
+//       price: '$4.99',
+//       features: [
+//         'Diamond tools and armor set',
+//         '64x of various valuable resources',
+//         '3 exclusive mystery crates',
+//         'Special particle effects for 7 days'
+//       ],
+//       popular: false,
+//       category: 'vip-packages'
+//     },
+//     {
+//       id: '3307114',
+//       name: 'Ultimate Bundle',
+//       description: 'The complete package with all benefits and perks combined.',
+//       price: '$19.99',
+//       features: [
+//         'VIP membership for 30 days',
+//         'Premium starter kit with double resources',
+//         'Exclusive cosmetic items and effects',
+//         '5 vote keys and 3 legendary crates'
+//       ],
+//       popular: true,
+//       category: 'game-boosts'
+//     },
+//     {
+//       id: '3307115',
+//       name: 'Fly Pass',
+//       description: 'Enjoy the ability to fly around the map.',
+//       price: '$7.99',
+//       features: [
+//         'Ability to fly in survival mode',
+//         '7 days of flight time',
+//         'Auto-renewal option',
+//         'Works in all non-restricted zones'
+//       ],
+//       popular: false,
+//       category: 'game-boosts'
+//     },
+//     {
+//       id: '3307116',
+//       name: 'Enchantment Bundle',
+//       description: 'Access to rare and powerful enchantments.',
+//       price: '$12.99',
+//       features: [
+//         '5 custom enchantment books',
+//         'Ability to apply higher level enchantments',
+//         'Access to exclusive enchantment table',
+//         '1 legendary enchantment scroll'
+//       ],
+//       popular: false,
+//       category: 'game-boosts'
+//     },
+//     {
+//       id: '3307117',
+//       name: 'Weekly Crate Keys',
+//       description: 'Get weekly delivery of crate keys for a month.',
+//       price: '$14.99',
+//       features: [
+//         '5 crate keys delivered weekly',
+//         'Access to special weekly rewards',
+//         'Chance for rare and exclusive items',
+//         'Automatic delivery for 4 weeks'
+//       ],
+//       popular: false,
+//       category: 'game-boosts'
+//     },
+//     {
+//       id: '3307118',
+//       name: 'Economy Booster',
+//       description: 'Boost your in-game economy with this package.',
+//       price: '$9.99',
+//       features: [
+//         'Starting cash bonus of 10,000 coins',
+//         'Double earnings from all jobs for 7 days',
+//         '3 money pouches with random amounts',
+//         'Access to special merchant with discounted prices'
+//       ],
+//       popular: false,
+//       category: 'game-boosts'
+//     }
+//   ];
+// }
 
 /**
  * Create a default store-categories.json file if it doesn't exist
