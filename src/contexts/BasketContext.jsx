@@ -198,8 +198,13 @@ export function BasketProvider({ children }) {
     }
     
     try {
+      if(!username) {
+        console.warn('Cannot sync cart with basket: No username set');
+        setError('You must be logged in to sync your cart');
+        return null;
+      }
       // Ensure we have a valid basket
-      const currentBasketIdent = await getOrCreateBasket();
+      const currentBasketIdent = await getOrCreateBasket(username);
       if (!currentBasketIdent) {
         throw new Error('Failed to get or create basket for cart sync');
       }
@@ -235,6 +240,11 @@ export function BasketProvider({ children }) {
       // Complete URL and cancel URL default to current page
       const completeUrl = window.location.href;
       const cancelUrl = window.location.href;
+
+      if(basketIdent) {
+        // If we already have a basket, just return its ID
+        return basketIdent;
+      }
       
       const response = await tebexService.createBasket(completeUrl, cancelUrl, username);
       
@@ -310,7 +320,7 @@ export function BasketProvider({ children }) {
   };
   
   // Get or create a basket
-  const getOrCreateBasket = async () => {
+  const getOrCreateBasket = async (username=username) => {
     // Don't allow basket creation without a username
     if (!username) {
       console.warn('Cannot create basket: No username set');
@@ -381,9 +391,14 @@ export function BasketProvider({ children }) {
     try {
       setIsLoading(true);
       setError(null);
+      if(!username) {
+        console.warn('Cannot add package to basket: No username set');
+        setError('You must be logged in to add a package to the basket');
+        return null;
+      }
       
       // Ensure we have a valid basket
-      const currentBasketIdent = await getOrCreateBasket();
+      const currentBasketIdent = await getOrCreateBasket(username);
       if (!currentBasketIdent) {
         throw new Error('Could not create or fetch basket');
       }
@@ -546,8 +561,13 @@ export function BasketProvider({ children }) {
       
       const formattedUsername = edition === 'bedrock' ? `.${checkoutUsername}` : checkoutUsername;
       
+      if(!username){
+        console.warn('Cannot checkout: No username set');
+        setError('You must be logged in to checkout');
+        return false;
+      }
       // 1. Create or get existing basket
-      const currentBasketIdent = await getOrCreateBasket();
+      const currentBasketIdent = await getOrCreateBasket(username);
       if (!currentBasketIdent) {
         throw new Error('Failed to create or get basket');
       }
@@ -561,21 +581,21 @@ export function BasketProvider({ children }) {
       }
       
       // 2. If we have items in cart, ensure they're in the basket
-      if (cart && cart.length > 0) {
-        let syncSuccess = true;
-        for (const item of cart) {
-          try {
-            await addPackageToBasket(item.id, 1);
-          } catch (e) {
-            console.error(`Failed to add item ${item.id} to basket:`, e);
-            syncSuccess = false;
-          }
-        }
+      // if (cart && cart.length > 0) {
+      //   let syncSuccess = true;
+      //   for (const item of cart) {
+      //     try {
+      //       await addPackageToBasket(item.id, 1);
+      //     } catch (e) {
+      //       console.error(`Failed to add item ${item.id} to basket:`, e);
+      //       syncSuccess = false;
+      //     }
+      //   }
         
-        if (!syncSuccess) {
-          console.warn('Some items may not have been added to the basket properly');
-        }
-      }
+      //   if (!syncSuccess) {
+      //     console.warn('Some items may not have been added to the basket properly');
+      //   }
+      // }
       
       // 3. Get checkout data with basket ident
       const checkoutData = await tebexService.processCheckout(currentBasketIdent, formattedUsername, edition);
@@ -690,7 +710,33 @@ export function BasketProvider({ children }) {
       setIsLoading(false);
     }
   };
+
+  const deleteBasket = async () => {  
+    try {
+      // Only attempt server deletion if we have a valid basket ID
+      if (basketIdent) {
+        // Call Tebex API to delete basket from server
+        await tebexService.deleteBasket(basketIdent);
+      }
   
+      // Clear client-side state
+      clearBasketState();
+      setBasketIdent(null);
+      setBasketData(null);
+      setHasInitializedBasket(false);
+      setError(null);
+      setIsLoading(false);
+      setCheckoutUrl(null); // Fix typo: setIscheckoutUrl -> setCheckoutUrl
+      setIsProcessingCheckout(false);
+  
+      console.log('Basket deleted successfully');
+      return true;
+    } catch (error) {
+      console.error('Error deleting basket:', error);
+      setError('Failed to delete basket. Please try again.');
+      return false;
+    }
+  };
   // Open the cart modal
   const openBasket = () => {
     setBasketOpen(true);
@@ -729,6 +775,7 @@ export function BasketProvider({ children }) {
     fetchBasket,
     getOrCreateBasket,
     addPackageToBasket,
+    deleteBasket,
     removePackageFromBasket,
     checkoutCart,
     resetBasket,

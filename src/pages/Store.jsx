@@ -401,7 +401,11 @@ export default function Store() {
       // Ensure we have a valid basket before adding to cart
       if (basketContext) {
         // Make sure we have a valid basket (create one if needed)
-        const basketId = await basketContext.getOrCreateBasket();
+        if(!username) {
+          console.warn('No username available for basket operations, will retry later');  
+          return; // Will retry on next render once username is set
+        }
+        const basketId = await basketContext.getOrCreateBasket(username);
         
         if (!basketId) {
           setBasketError('Failed to initialize your shopping cart. Please try again.');

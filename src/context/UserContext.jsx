@@ -60,6 +60,7 @@ export const UserProvider = ({ children }) => {
   
   // Logout function
   const logout = () => {
+    localStorage.removeItem('minecraft_username');
     setUsername('');
     setIsLoggedIn(false);
   };

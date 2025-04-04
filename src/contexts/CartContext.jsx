@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // import { useBasket } from './BasketContext'; // Import the BasketContext
+import { useUser } from '../context/UserContext'; // Import the UserContext
 
 const CartContext = createContext();
 
@@ -12,6 +13,7 @@ export function useCart() {
 
 export function CartProvider({ children }) {
   // Load cart from localStorage on initial render
+  const { username } = useUser();
   const [cart, setCart] = useState(() => {
     try {
       const savedCart = localStorage.getItem('shoppingCart');
@@ -79,7 +81,11 @@ export function CartProvider({ children }) {
       if (!basketContext.basketIdent && !basketContext.hasInitializedBasket) {
         // Try to initialize a basket first
         try {
-          const basketId = await basketContext.getOrCreateBasket();
+          if(!username) {
+            console.warn('No username available for basket operations, will retry later');  
+            return; // Will retry on next render once username is set
+          }
+          const basketId = await basketContext.getOrCreateBasket(username);
           if (!basketId) {
             console.warn('Could not create or get basket, will retry later');
             return; // Will retry on next render
@@ -213,6 +219,7 @@ export function CartProvider({ children }) {
   
   // Clear the entire cart
   const clearCart = () => {
+    
     setCart([]);
     // Don't clear the Tebex basket here - that's handled separately during checkout
   };

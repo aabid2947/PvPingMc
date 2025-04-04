@@ -17,7 +17,8 @@ export default function CheckoutModal({ isOpen, onClose }) {
     developmentCheckout,
     basketData,
     fetchBasket,
-    basketIdent
+    basketIdent,
+    getPackagesTotal
   } = useBasket();
   
   const [username, setUsername] = useState(savedUsername || '');
@@ -55,13 +56,13 @@ export default function CheckoutModal({ isOpen, onClose }) {
       setItemCount(basketData.packages.length);
       
       // Calculate total from basket data
-      if (basketData.total) {
-        setOrderTotal(basketData.total);
+      if (getPackagesTotal) {
+        setOrderTotal(getPackagesTotal);
       }
     } else if (cart && cart.length > 0) {
       // Fallback to cart data if basket data is not available
       setItemCount(cart.length);
-      setOrderTotal(getCartTotal());
+      setOrderTotal(getPackagesTotal);
     } else {
       setItemCount(0);
       setOrderTotal('0.00');

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FiX, FiUser, FiLoader } from 'react-icons/fi';
+import { useBasket } from '../contexts/BasketContext';
 
 /**
  * A modal component that prompts users to enter their Minecraft username 
@@ -11,6 +12,7 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
   const [edition, setEdition] = useState('java'); // 'java' or 'bedrock'
   const [isProcessing, setIsProcessing] = useState(false);
   const modalRef = useRef(null);
+  const {getOrCreateBasket} = useBasket();
 
   // Reset state when modal opens
   useEffect(() => {
@@ -67,6 +69,8 @@ function LoginModal({ isOpen, onClose, onLoginSuccess }) {
     
     try {
       setIsProcessing(true);
+
+    await getOrCreateBasket(username);
       
       // If all validations pass, call the success handler with username and edition
       // Using setTimeout to allow the UI to update with the processing state

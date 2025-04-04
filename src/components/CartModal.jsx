@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FiX, FiShoppingCart, FiTrash2, FiArrowRight, FiCheck, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
+import { FiX,FiLogOut, FiShoppingCart, FiTrash2, FiArrowRight, FiCheck, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../context/UserContext';
 import { useBasket } from '../contexts/BasketContext';
@@ -17,7 +17,7 @@ function CartModal() {
     pendingBasketOperations
   } = useCart();
   
-  const { username } = useUser();
+  const { username,logout } = useUser();
   const { 
     error: basketError, 
     isLoading: basketLoading,
@@ -25,7 +25,8 @@ function CartModal() {
     syncCartWithBasket,
     basketData,
     basketIdent,
-    getPackagesTotal
+    getPackagesTotal,
+    deleteBasket,
   } = useBasket();
   
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
@@ -90,6 +91,19 @@ function CartModal() {
     // Show the checkout modal
     setShowCheckoutModal(true);
   };
+
+  const handleLogout = () => {
+    // Clear all user-related data
+    logout(); 
+    // Clear cart state
+    clearCart();
+    // Clear basket state
+    deleteBasket();
+    // Close cart modal
+    closeCart();
+    // Optional: Delete basket from server if needed
+    
+  };
   
   // Handle closing the checkout modal
   const handleCloseCheckout = () => {
@@ -140,7 +154,7 @@ function CartModal() {
             )}
             
             {/* Basket synchronization status */}
-            {pendingBasketOperations.length > 0 && (
+            {/* {pendingBasketOperations.length > 0 && (
               <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md">
                 <div className="flex">
                   <div className="flex-shrink-0 animate-spin">
@@ -156,7 +170,7 @@ function CartModal() {
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
             
             {/* Basket error message */}
             {basketError && (
@@ -176,15 +190,15 @@ function CartModal() {
                         className="mt-2 text-blue-400 hover:text-blue-300 flex items-center"
                         disabled={syncStatus.syncing}
                       >
-                        {syncStatus.syncing ? (
+                        {/* {syncStatus.syncing ? (
                           <>
                             <FiRefreshCw className="mr-1 animate-spin" /> Syncing...
                           </>
-                        ) : (
+                        ) : ( */}
                           <>
                             <FiRefreshCw className="mr-1" /> Try Syncing Again
                           </>
-                        )}
+                        {/* // )} */}
                       </button>
                     </div>
                   </div>
@@ -258,23 +272,33 @@ function CartModal() {
                       className="py-2 px-4 rounded-md text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center"
                       disabled={cart.length === 0 || pendingBasketOperations.length > 0}
                     >
-                      {pendingBasketOperations.length > 0 ? (
+                      {/* {pendingBasketOperations.length > 0 ? (
                         <>
                           <FiRefreshCw className="animate-spin mr-2" />
                           Syncing...
                         </>
-                      ) : (
-                        <>
+                      ) : ( */}
+                      
                           Checkout
                           <FiArrowRight className="ml-2" />
-                        </>
-                      )}
+                        
+                      {/* )} */}
                     </button>
                   </div>
                 </div>
               </>
             )}
           </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-700">
+        <button
+          onClick={handleLogout}
+          className="w-full py-2 px-4 rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors duration-200 flex items-center justify-center"
+        >
+          <FiLogOut className="mr-2" />
+          Logout & Clear All Data
+        </button>
+      </div>
         </div>
       </div>
       
@@ -283,6 +307,7 @@ function CartModal() {
         isOpen={showCheckoutModal} 
         onClose={handleCloseCheckout} 
       />
+     
     </>
   );
 }
