@@ -124,7 +124,7 @@ export default function OriginMC() {
   }, []);
 
   const handleLogout = () => {
-    if(!username){
+    if(username){
 
       // Perform logout logic here
       // For example, clear user data, redirect to login page, etc. 
